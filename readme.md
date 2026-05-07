@@ -1,0 +1,2 @@
+-- install terminal bash $ pip install openpyxl
+-- 
