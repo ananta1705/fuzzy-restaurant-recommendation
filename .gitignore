@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+*.py[cod]
+output_analisis/*
+!output_analisis/.gitkeep
+.DS_Store
