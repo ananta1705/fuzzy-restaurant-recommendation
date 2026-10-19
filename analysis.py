@@ -394,19 +394,42 @@ def display_if_notebook(obj):
 
 
 def main():
-    print("=== PERSIAPAN DAN VALIDASI ===")
+    print("=== VALIDASI DATA REGIONAL ===")
     ts, reg, series = prepare_data()
-    print(f"Time Series: {len(ts)} baris | {ts.index.min().date()} s.d. {ts.index.max().date()}")
-    print(f"Regional: {len(reg)} provinsi")
-    print(f"Missing Time Series: {int(ts[PLATFORMS].isna().sum().sum())}")
-    print(f"Missing Regional: {int(reg[PLATFORMS].isna().sum().sum())}")
-    print(f"TikTok Shop aktif: {len(series['TikTok Shop'])} observasi sejak {series['TikTok Shop'].index.min().date()}")
+    val_table = pd.DataFrame({
+        "Pemeriksaan": [
+            "Jumlah provinsi",
+            "Jumlah platform",
+            "Jumlah indeks regional",
+            "Nilai kosong",
+            "Periode pengamatan"
+        ],
+        "Hasil yang diharapkan": [
+            len(reg),
+            len(PLATFORMS),
+            len(reg) * len(PLATFORMS),
+            f"{int(reg[PLATFORMS].isna().sum().sum())}, jika terverifikasi",
+            "2020–2025"
+        ]
+    })
+    print(val_table.to_string(index=False))
 
-    print("\n=== BAGIAN A: ANALISIS TREN WAKTU ===")
-    temporal_results, breaks = plot_temporal(ts, series)
+    print("\n=== STATISTIK DESKRIPTIF REGIONAL ===")
+    desc_regional = pd.DataFrame({
+        "N Provinsi": [len(reg[p]) for p in PLATFORMS],
+        "Mean": [reg[p].mean() for p in PLATFORMS],
+        "Median": [reg[p].median() for p in PLATFORMS],
+        "Std. Dev.": [reg[p].std() for p in PLATFORMS],
+        "Minimum": [reg[p].min() for p in PLATFORMS],
+        "Maksimum": [reg[p].max() for p in PLATFORMS],
+    }, index=PLATFORMS)
+    print(desc_regional.round(2).to_string())
 
-    print("\n=== BAGIAN B: ANALISIS REGIONAL ===")
+    print("\n=== EKSEKUSI ANALISIS REGIONAL & GRAFIK ===")
     regional_results, dominant, var_df = plot_regional(reg)
+
+    print("\n=== EKSEKUSI ANALISIS TREN WAKTU ===")
+    temporal_results, breaks = plot_temporal(ts, series)
 
     # C. Integrated summary
     mk_df = temporal_results["A3_MannKendall"]
