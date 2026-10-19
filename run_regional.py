@@ -89,11 +89,27 @@ def main():
     print(corr_reg.round(3).to_string())
     
     # Simpan Heatmap Korelasi
-    plt.figure(figsize=(7, 6))
-    sns.heatmap(corr_reg, annot=True, fmt=".2f", cmap="RdBu_r", vmin=-1, vmax=1)
-    plt.title("Korelasi Spearman Antarplatform Lintas Provinsi")
+    fig, ax = plt.subplots(figsize=(7.2, 6.4), dpi=300)
+    im = ax.imshow(corr_reg.values, cmap="viridis", vmin=-1.0, vmax=1.0, aspect="equal")
+    for i in range(len(PLATFORMS)):
+        for j in range(len(PLATFORMS)):
+            val = corr_reg.iloc[i, j]
+            ax.text(j, i, f"{val:.3f}", ha="center", va="center", color="black", fontsize=10.5)
+    ax.set_xticks(range(len(PLATFORMS)))
+    ax.set_yticks(range(len(PLATFORMS)))
+    ax.set_xticklabels(PLATFORMS, rotation=35, ha="right", rotation_mode="anchor", fontsize=11)
+    ax.set_yticklabels(PLATFORMS, fontsize=11)
+    ax.set_title("Spearman Rank Correlation Across Provinces", fontsize=13, pad=12)
+    cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    cbar.set_ticks(np.linspace(-1.0, 1.0, 9))
+    cbar.set_ticklabels([f"{t:.2f}" for t in np.linspace(-1.0, 1.0, 9)], fontsize=10)
+    cbar.set_label("Spearman's rho", fontsize=11, labelpad=8)
+    cbar.outline.set_edgecolor("black")
+    cbar.outline.set_linewidth(0.8)
     plt.tight_layout()
-    plt.savefig(OUT_DIR / "B7_korelasi_regional.png", dpi=200, bbox_inches="tight")
+    fig.savefig(OUT_DIR / "B7_korelasi_regional.png", dpi=300, bbox_inches="tight")
+    fig.savefig("figure2_spearman_correlation.png", dpi=300, bbox_inches="tight")
+    fig.savefig("spearman_rank_correlation.png", dpi=300, bbox_inches="tight")
     plt.close()
 
     # Hitung p-value dan koreksi Holm untuk semua pasangan
